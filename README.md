@@ -37,16 +37,20 @@ NOTE: It may take some time for the DNS record that you set to propogate or take
 ## HOW TO RUN SCRIPT
 
 1. Clone the script to your server
-   ```git clone https://github.com/Heiminda/piwigo-plus.git
+   ```
+   git clone https://github.com/Heiminda/piwigo-plus.git
    ```
 3. Change to script directory
-   ```cd piwigo-plus
+   ```
+   cd piwigo-plus
    ```
 5. Make script executable
-   ```sudo chmod +x p-plus.sh
+   ```
+   sudo chmod +x p-plus.sh
    ```
 7. Run the script
-   ```./p-plus.sh
+   ```
+   ./p-plus.sh
    ```
 
 Hit y and enter to start the script, you will be asked to enter some details. Enter them when asked and hit enter.
