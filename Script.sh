@@ -52,7 +52,7 @@ echo -e "Installing LAMP Server..\n"
 sudo apt install apache2 mariadb-server php libapache2-mod-php php-common php-mbstring php-xmlrpc php-gd php-xml php-intl php-mysql php-cli php php-ldap php-zip php-curl unzip git -y || echo "Failed to install LAMP server"
 echo "LAMP server installed successfully"
 
-
+sudo systemctl start apache2
 # Configuring PHP
 
 # Get PHP version
@@ -130,7 +130,7 @@ echo "Piwigo added successfully"
 
 # Configure Apache for Piwigo
 echo "Configuring Apache for Piwigo.."
-sudo cp apache_config.conf "/etc/apache2/sites-available/$domain.conf" || echo "Failed to copy Apache configuration"
+sudo cp http_apache_config.conf "/etc/apache2/sites-available/$domain.conf" || echo "Failed to copy Apache configuration"
 sudo sed -i "s/domain_name/$domain/g" "/etc/apache2/sites-available/$domain.conf" || echo "Failed to update Apache configuration"
 # Server information leakage disabling
 echo "ServerSignature Off" | sudo tee -a /etc/apache2/apache2.conf || echo "Failed to update apache config"
@@ -188,6 +188,8 @@ read -r email
 sudo certbot certonly --agree-tos --email $email --webroot -w /var/lib/letsencrypt/ -d $domain -d www.$domain || echo "Failed to generate SSL certificate. Check your DNS settings."
 echo "SSL Certficate is issued to your domain successfully"
 echo "SSL certificate saved to /etc/letsencrypt/live/$domain. You may need to back that up."
+sudo cp https_apache_config.conf "/etc/apache2/sites-available/$domain.conf" || echo "Failed to copy Apache configuration"
+sudo sed -i "s/domain_name/$domain/g" "/etc/apache2/sites-available/$domain.conf" || echo "Failed to update Apache configuration"
 sudo systemctl reload apache2
 echo "Test your domain using the SSL Labs Server Test https://www.ssllabs.com/ssltest/, you’ll get an A+ grade"
 echo "Your piwigo gallery is up and running at https://$domain"
