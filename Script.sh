@@ -95,12 +95,11 @@ echo "Enter a strong password for database: "
 read -r passwd
 
 # Create a Database for Piwigo
-mysql <<EOF
+sudo mysql <<EOF
 CREATE DATABASE piwigo;
 CREATE USER 'piwigo'@'localhost' IDENTIFIED BY '$passwd';
 GRANT ALL ON piwigo.* TO 'piwigo'@'localhost' IDENTIFIED BY '$passwd' WITH GRANT OPTION;
 FLUSH PRIVILEGES;
-EXIT;
 EOF
 echo "Created Piwigo database"
 echo "Your database details is as folllows"
@@ -120,7 +119,7 @@ sudo mv piwigo /var/www/$domain || echo "Failed to move Piwigo to /var/www/$doma
 # Install dependency for video
 sudo apt install ffmpeg exiftool mediainfo -y
 echo "Adding Videojs plugin"
-sudo git https://github.com/Piwigo/piwigo-videojs.git /var/www/$domain/plugins/piwigo-videojs
+sudo git clone https://github.com/Piwigo/piwigo-videojs.git /var/www/$domain/plugins/piwigo-videojs
 echo "Adding video and multiformat support configuration.."
 sudo cp config.inc.php /var/www/$domain/local/config
 echo "Setting permissions for folders.."
@@ -180,14 +179,13 @@ sudo a2enconf ssl-params
 sudo a2enmod http2
 
 sudo systemctl reload apache2 || echo "Failed to restart Apache"
-
+echo "Make sure that your DNS is set properly before you continue or piwigo will break."
+[[ "$(read -r -e -p 'Continue with SSL installation? [y/N]> '; echo "$REPLY")" == [Yy]* ]] && echo "Starting the installation.." || exit 1
 # Prompt for an email for registering SSL
 echo "Enter your email for registering to Let's Encrypt SSL: "
 read -r email
 
 sudo certbot certonly --agree-tos --email $email --webroot -w /var/lib/letsencrypt/ -d $domain -d www.$domain || echo "Failed to generate SSL certificate. Check your DNS settings."
-echo "SSL Certficate is issued to your domain successfully"
-echo "SSL certificate saved to /etc/letsencrypt/live/$domain. You may need to back that up."
 sudo cp https_apache_config.conf "/etc/apache2/sites-available/$domain.conf" || echo "Failed to copy Apache configuration"
 sudo sed -i "s/domain_name/$domain/g" "/etc/apache2/sites-available/$domain.conf" || echo "Failed to update Apache configuration"
 sudo systemctl reload apache2
